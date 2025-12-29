@@ -34,6 +34,8 @@ call-center-analysis/
 git clone https://github.com/your-username/call-center-analysis.git  
 cd call-center-analysis/backend  
 
+.env.example dosyasını .env olarak değiştirin
+
 2. Virtual environment oluşturun  
 python -m venv venv  
 
