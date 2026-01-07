@@ -5,9 +5,37 @@ from typing import List, Dict, Optional
 import httpx
 import json
 import os
-import asyncio
 from datetime import datetime
 from collections import defaultdict
+from dotenv import load_dotenv
+from openai import OpenAI
+import warnings
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Load credentials from .env file
+api_key = os.getenv('GPT_OSS_API_KEY')
+proxy_username = os.getenv('proxy_username')
+proxy_password = os.getenv('proxy_password')
+username = os.getenv("PRACTICUS_USERNAME", "")
+pwd = os.getenv("PRACTICUS_PASSWORD", "")
+
+# Verify API key is loaded
+if not api_key:
+    raise ValueError("GPT_OSS_API_KEY not found in .env file")
+print(f"✅ API Key loaded: {api_key[:20]}...")
+
+proxy = f"http://{proxy_username}:{proxy_password}@172.31.53.99:8080/"
+os.environ['http_proxy'] = proxy
+os.environ['HTTP_PROXY'] = proxy
+os.environ['https_proxy'] = proxy
+os.environ['HTTPS_PROXY'] = proxy
+no_proxy=".vodafone.local,localhost"
+os.environ['no_proxy'] = no_proxy
+os.environ['NO_PROXY'] = no_proxy
+import warnings
+warnings.filterwarnings('ignore')
 
 app = FastAPI(
     title="Call Center Analysis API - WebSocket Edition",
@@ -24,9 +52,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# GPT-OSS-20B API konfigürasyonu
-GPT_OSS_API_URL = os.getenv("GPT_OSS_API_URL", "http://your-gpt-oss-endpoint/v1/chat/completions")
-GPT_OSS_API_KEY = os.getenv("GPT_OSS_API_KEY", "your-api-key-here")
+# OpenAI API configuration for Practicus AI
+base_url = "https://practicus.vodafone.local/models/model-gateway-ai-hackathon/latest/v1"
+
+# Initialize OpenAI client with custom HTTP client for proxy support
+try:
+    # Don't use proxy for internal .vodafone.local domains
+    # The base_url is internal, so we should connect directly
+    print(f"🔧 Connecting directly to internal endpoint (bypassing proxy)")
+    
+    client = OpenAI(
+        base_url=base_url,
+        api_key=api_key,
+        http_client=httpx.Client(
+            verify=False,  # SSL sertifikası doğrulamasını devre dışı bırak
+            timeout=60.0
+        )
+    )
+    print("✅ OpenAI client initialized successfully")
+except Exception as e:
+    print(f"⚠️ OpenAI client initialization warning: {e}")
+    client = OpenAI(base_url=base_url, api_key=api_key)
 
 # WebSocket bağlantı yöneticisi
 class ConnectionManager:
@@ -123,64 +169,64 @@ async def call_gpt_oss_20b(conversation_text: str) -> Dict:
     
     prompt = ANALYSIS_PROMPT.format(conversation_text=conversation_text)
     
-    payload = {
-        "model": "gpt-oss-20b",
-        "messages": [
-            {
-                "role": "system",
-                "content": "Sen bir müşteri hizmetleri analiz uzmanısın. Sadece JSON yanıt ver."
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        "temperature": 0.3,
-        "max_tokens": 1500,
-        "top_p": 0.9
-    }
-    
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {GPT_OSS_API_KEY}"
-    }
+    messages = [
+        {
+            "role": "system",
+            "content": "Sen bir müşteri hizmetleri analiz uzmanısın. Sadece JSON yanıt ver."
+        },
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
     
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                GPT_OSS_API_URL,
-                json=payload,
-                headers=headers
-            )
-            response.raise_for_status()
-            
-            data = response.json()
-            model_response = data["choices"][0]["message"]["content"]
-            
-            # JSON temizleme
-            model_response = model_response.strip()
-            if model_response.startswith("```json"):
-                model_response = model_response[7:]
-            if model_response.startswith("```"):
-                model_response = model_response[3:]
-            if model_response.endswith("```"):
-                model_response = model_response[:-3]
-            model_response = model_response.strip()
-            
-            analysis = json.loads(model_response)
+        response = client.chat.completions.create(
+            model="practicus/gpt-oss-20b-hackathon",
+            messages=messages,
+            temperature=0.3,
+            max_tokens=1500,
+            top_p=0.9,
+            frequency_penalty=0.5,
+            presence_penalty=0.3,
+            seed=-1,
+            extra_body={
+                "metadata": {
+                    "username": username,
+                    "pwd": pwd,
+                }
+            }
+        )
+        
+        model_response = response.choices[0].message.content
+        
+        # JSON temizleme
+        model_response = model_response.strip()
+        if model_response.startswith("```json"):
+            model_response = model_response[7:]
+        if model_response.startswith("```"):
+            model_response = model_response[3:]
+        if model_response.endswith("```"):
+            model_response = model_response[:-3]
+        model_response = model_response.strip()
+        
+        analysis = json.loads(model_response)
             
             # Genel skoru hesapla
-            overall_score = round(
-                (analysis["sentiment"] + analysis["resolution"] + analysis["agentPerformance"]) / 3
-            )
+        overall_score = round(
+            (analysis["sentiment"] + analysis["resolution"] + analysis["agentPerformance"]) / 3
+        )
             
-            analysis["overallScore"] = overall_score
+        analysis["overallScore"] = overall_score
             
-            return analysis
+        return analysis
             
     except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
         print(f"GPT-OSS-20B Error: {e}")
-        raise
+        print(f"Error detail:\n{error_detail}")
+        raise HTTPException(status_code=500, detail=f"Model API error: {str(e)}")
 
 # REST API Endpoints (önceki gibi)
 @app.get("/")
@@ -193,7 +239,6 @@ async def root():
         "websocket": "/ws/{client_id}",
         "connections": len(manager.active_connections)
     }
-
 @app.post("/api/analyze", response_model=AnalysisResponse)
 async def analyze_conversation(request: ConversationRequest):
     """Tek konuşma analizi (REST endpoint)"""

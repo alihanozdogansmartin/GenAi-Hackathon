@@ -1,0 +1,27 @@
+Müşteri: Merhaba, 3 gündür siparişim elime ulaşmadı. Ne zaman gelecek? 
+Temsilci: Merhaba, yardımcı olabilirim. Sipariş numaranızı alabilir miyim? 
+Müşteri: Evet, #12345 
+Temsilci: Teşekkürler. Sistemde kontrol ediyorum... Siparişiniz kargoya verilmiş ve yarın size ulaşacak. 
+Müşteri: Peki teşekkür ederim, bilgilendirme için. 
+Temsilci: Rica ederim, iyi günler dilerim!
+
+Konuşma #2
+
+
+Müşteri: Bu nasıl hizmet! 2 haftadır ürünüm gelmiyor, hiç kimse ilgilenmiyor! 
+Temsilci: Özür dilerim, durumu hemen kontrol ediyorum. 
+Müşteri: Kontrol edin ama her seferinde aynı şeyleri söylüyorsunuz! 
+Temsilci: Anlıyorum, haklısınız. Kargo firmasıyla irtibata geçiyorum... Ürününüz kaybolmuş görünüyor. 
+Müşteri: Ne demek kaybolmuş? Param ne olacak? 
+Temsilci: Hemen yeni ürün gönderiyoruz ve ücretsiz express kargo ile bugün yola çıkacak. Ayrıca bir sonraki alışverişinizde kullanabileceğiniz %20 indirim kuponu tanımlıyorum. 
+Müşteri: Tamam, umarım bu sefer sorun olmaz.
+
+Konuşma #3
+
+
+Müşteri: Merhaba, ürün iade etmek istiyorum. 
+Temsilci: Tabii, yardımcı olayım. İade sebebiniz nedir? 
+Müşteri: Beden uygun değil, daha küçük istiyorum. 
+Temsilci: Anladım, iade işleminizi başlatıyorum. Kargo kodunuzu mail olarak göndereceğim. 
+Müşteri: Harika, teşekkürler! Temsilci: Rica ederim, size yardımcı olabildiğim için mutluyum.
+
