@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Phone, User, Headset } from 'lucide-react';
+import { Phone, User, Headset, Shield, Database } from 'lucide-react';
 import CustomerView from './CustomerView';
 import AgentView from './AgentView';
+import AdminView from './AdminView';
+import DatabaseView from './DatabaseView';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ function HomePage() {
         </div>
 
         {/* Kullanıcı Seçim Kartları */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Müşteri Kartı */}
           <button
             onClick={() => navigate('/customer')}
@@ -80,6 +82,58 @@ function HomePage() {
               </div>
             </div>
           </button>
+
+          {/* Yönetici Kartı */}
+          <button
+            onClick={() => navigate('/admin')}
+            className="group bg-white rounded-3xl shadow-2xl p-10 hover:shadow-yellow-500/50 transition-all duration-300 hover:-translate-y-3 border-4 border-transparent hover:border-yellow-500"
+          >
+            <div className="flex flex-col items-center text-center space-y-5">
+              <div className="w-28 h-28 bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <Shield className="w-14 h-14 text-white" />
+              </div>
+              <h2 className="text-4xl font-bold text-gray-900">Yönetici</h2>
+              <p className="text-gray-700 text-lg">
+                Anlatık raporlar, trendler ve AI destekli analiz sonuçları
+              </p>
+              <div className="pt-4 space-y-3 text-base text-gray-600">
+                <p className="flex items-center justify-center gap-2"><span className="text-yellow-600">●</span> Günlük Raporlar</p>
+                <p className="flex items-center justify-center gap-2"><span className="text-yellow-600">●</span> Trend Analizi</p>
+                <p className="flex items-center justify-center gap-2"><span className="text-yellow-600">●</span> Ortak Sorunlar</p>
+              </div>
+              <div className="pt-6">
+                <span className="px-8 py-4 bg-yellow-600 text-white rounded-full font-bold text-lg group-hover:bg-yellow-700 transition-colors inline-block shadow-lg">
+                  Yönetici Olarak Devam Et
+                </span>
+              </div>
+            </div>
+          </button>
+
+          {/* Database Kartı */}
+          <button
+            onClick={() => navigate('/database')}
+            className="group bg-white rounded-3xl shadow-2xl p-10 hover:shadow-blue-500/50 transition-all duration-300 hover:-translate-y-3 border-4 border-transparent hover:border-blue-500"
+          >
+            <div className="flex flex-col items-center text-center space-y-5">
+              <div className="w-28 h-28 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <Database className="w-14 h-14 text-white" />
+              </div>
+              <h2 className="text-4xl font-bold text-gray-900">Veritabanı</h2>
+              <p className="text-gray-700 text-lg">
+                Tüm konuşmalar, raporlar ve detaylı istatistikler
+              </p>
+              <div className="pt-4 space-y-3 text-base text-gray-600">
+                <p className="flex items-center justify-center gap-2"><span className="text-blue-600">●</span> Tüm Veriler</p>
+                <p className="flex items-center justify-center gap-2"><span className="text-blue-600">●</span> Filtreleme</p>
+                <p className="flex items-center justify-center gap-2"><span className="text-blue-600">●</span> İstatistikler</p>
+              </div>
+              <div className="pt-6">
+                <span className="px-8 py-4 bg-blue-600 text-white rounded-full font-bold text-lg group-hover:bg-blue-700 transition-colors inline-block shadow-lg">
+                  Database'e Git
+                </span>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Footer */}
@@ -105,6 +159,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/customer" element={<CustomerView />} />
         <Route path="/agent" element={<AgentView />} />
+        <Route path="/admin" element={<AdminView />} />
+        <Route path="/database" element={<DatabaseView />} />
       </Routes>
     </Router>
   );
