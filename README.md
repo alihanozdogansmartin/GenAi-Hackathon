@@ -7,7 +7,7 @@ Node.js 16+ ve npm
 
 Git
 
-GPT-OSS-20B API erişimi
+Practicus API erişimi
 
 📁 Proje Yapısı  
 call-center-analysis/  
