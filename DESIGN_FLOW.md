@@ -739,7 +739,7 @@ JSON formatında yanıt ver:
 
 ### AI/ML
 - **LLM**: GPT-OSS-20B (Practicus AI)
-- **Embeddings**: all-MiniLM-L6-v2 (ChromaDB default)
+- **Embeddings**: gemma-300m-hackathon (Practicus AI)
 - **Vector Search**: Cosine similarity
 
 ---
